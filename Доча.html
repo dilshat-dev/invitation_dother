@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Приглашение на День Рождения</title>
+    <style>
+        body {
+            font-family: "Georgia", serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        #overlay {
+            background-image: url('доча123.jpg'); /* Укажите путь к изображению */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            animation: fadeIn 2s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            line-height: 1.4;
+            opacity: 0;
+            animation: fadeUp 1.5s 0.5s forwards;
+        }
+
+        h1:first-of-type {
+            font-size: 3rem; /* Более крупный заголовок для приветствия */
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            animation: fadeUp 1s 1s forwards;
+            margin: 20px 0 30px;
+        }
+
+        @keyframes fadeUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        button {
+            background-color: rgba(240, 138, 93, 0.8);
+            color: white;
+            padding: 15px 30px;
+            margin: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            transition: background-color 0.3s, transform 0.3s;
+            z-index: 1;
+            opacity: 0;
+            animation: fadeUp 1s 1.2s forwards;
+        }
+
+        button:hover {
+            background-color: rgba(184, 59, 94, 0.9);
+            transform: scale(1.1);
+        }
+
+        button:active {
+            transform: scale(0.9);
+        }
+
+        #message {
+            margin-top: 20px;
+            font-size: 1.3rem;
+            font-style: italic;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            animation: fadeUp 1s 1.5s forwards;
+        }
+
+        .host {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            animation: fadeIn 2s 2s forwards;
+        }
+    </style>
+</head>
+<body>
+    <div id="overlay">
+        <h1>Ассалам алейкум!</h1>
+        <h1>Һөрмятлик мехманлар, сизлярни нәвримиз Айнисаниң бөщүк тойиға тәклип қилимиз.</h1>
+        <p>Вас ожидать?</p>
+        <form id="rsvpForm">
+            <button type="button" onclick="submitResponse('Да')">Да</button>
+            <button type="button" onclick="submitResponse('Нет')">Нет</button>
+        </form>
+        <div id="message"></div>
+        <div class="host">Сәйипхан: Наргиз</div>
+    </div>
+
+    <script>
+        async function getIp() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch (error) {
+                console.error('Ошибка получения IP:', error);
+                return null;
+            }
+        }
+
+        async function submitResponse(response) {
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbzfKztEsNVVNZLoJBnjLRSrX6ofNnxuo7CvCPgvohYhRGP-RNiwwJOnqraIvwcisqXHww/exec';
+            const ip = await getIp();
+            
+            if (!ip) {
+                document.getElementById('message').innerText = 'Ошибка отправки, попробуйте позже.';
+                return;
+            }
+
+            const formData = new URLSearchParams();
+            formData.append('response', response);
+            formData.append('ip', ip);
+
+            fetch(scriptURL, { method: 'POST', body: formData })
+                .then(response => response.text())
+                .then(result => {
+                    if (result === 'duplicate') {
+                        document.getElementById('message').innerText = 'Вы уже отправили свой ответ. Спасибо!';
+                    } else if (result === 'success') {
+                        document.getElementById('message').innerText = 'Спасибо за ваш ответ!';
+                    } else {
+                        document.getElementById('message').innerText = 'Произошла ошибка, попробуйте ещё раз.';
+                    }
+                    document.getElementById('rsvpForm').style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Ошибка отправки:', error);
+                    document.getElementById('message').innerText = 'Произошла ошибка, попробуйте ещё раз.';
+                });
+        }
+    </script>
+</body>
+</html>
