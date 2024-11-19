@@ -44,7 +44,7 @@
         }
 
         h1 {
-            font-size: 1.75vw; /* уменьшен в два раза */
+            font-size: 1.75vw;
             font-weight: bold;
             margin-bottom: 10px;
             background: linear-gradient(45deg, #f09, #fb3, #f09);
@@ -58,17 +58,17 @@
         }
 
         h2 {
-            font-size: 1.25vw; /* уменьшен в два раза */
+            font-size: 1.25vw;
             font-weight: 600;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             color: rgba(255, 255, 255, 0.9);
-            margin: 0; /* убран отступ между этими строками */
+            margin: 0;
             opacity: 0;
             animation: fadeUp 1.5s 1s forwards;
         }
 
         p {
-            font-size: 1vw; /* уменьшен в два раза */
+            font-size: 1vw;
             font-weight: 500;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
             opacity: 0;
@@ -90,11 +90,11 @@
         button {
             background-color: rgba(240, 138, 93, 0.8);
             color: white;
-            padding: 0.5vw 1vw; /* уменьшен в два раза */
+            padding: 0.5vw 1vw;
             margin: 10px;
             border: none;
             cursor: pointer;
-            font-size: 0.75vw; /* уменьшен в два раза */
+            font-size: 0.75vw;
             border-radius: 10px;
             transition: background-color 0.3s, transform 0.3s;
             z-index: 1;
@@ -115,7 +115,7 @@
             position: absolute;
             bottom: 20px;
             right: 20px;
-            font-size: 0.75vw; /* уменьшен в два раза */
+            font-size: 0.75vw;
             font-weight: bold;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
             background: rgba(255, 255, 255, 0.9);
@@ -129,24 +129,24 @@
 
         @media (max-width: 768px) {
             h1 {
-                font-size: 1.25rem; /* уменьшен в два раза */
+                font-size: 1.25rem;
             }
 
             h2 {
-                font-size: 1rem; /* уменьшен в два раза */
+                font-size: 1rem;
             }
 
             p {
-                font-size: 0.75rem; /* уменьшен в два раза */
+                font-size: 0.75rem;
             }
 
             button {
-                padding: 5px 10px; /* уменьшен в два раза */
-                font-size: 0.5rem; /* уменьшен в два раза */
+                padding: 5px 10px;
+                font-size: 0.5rem;
             }
 
             .host {
-                font-size: 0.6rem; /* уменьшен в два раза */
+                font-size: 0.6rem;
             }
         }
     </style>
@@ -158,11 +158,40 @@
         <h2>сизлярни нәвримиз Айнисаниң бөщүк тойиға тәклип қилимиз.</h2>
         <p>Вас ожидать?</p>
         <form id="rsvpForm">
-            <button type="button" onclick="submitResponse('Да')">Да</button>
-            <button type="button" onclick="submitResponse('Нет')">Нет</button>
+            <button type="button" id="yesButton" onclick="submitResponse('Да')">Да</button>
+            <button type="button" id="noButton" onclick="submitResponse('Нет')">Нет</button>
         </form>
         <div id="message"></div>
         <div class="host">Сәйипхан: Наргиз</div>
     </div>
+
+    <script>
+        function submitResponse(response) {
+            // Получаем IP-адрес пользователя (можно заменить на что-то другое)
+            var userIp = "127.0.0.1"; // Пример, в реальности нужно получить IP пользователя
+
+            // Скрываем кнопки после ответа
+            document.getElementById('yesButton').style.display = 'none';
+            document.getElementById('noButton').style.display = 'none';
+
+            // Отправка данных на сервер
+            fetch('https://script.google.com/macros/s/AKfycbzfKztEsNVVNZLoJBnjLRSrX6ofNnxuo7CvCPgvohYhRGP-RNiwwJOnqraIvwcisqXHww/exec', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'response=' + encodeURIComponent(response) + '&ip=' + encodeURIComponent(userIp),
+            })
+            .then(response => response.text())
+            .then(result => {
+                if (result === "success") {
+                    document.getElementById('message').innerHTML = "Спасибо за ответ!";
+                } else if (result === "duplicate") {
+                    document.getElementById('message').innerHTML = "Вы уже ответили!";
+                }
+            })
+            .catch(error => console.error('Ошибка:', error));
+        }
+    </script>
 </body>
 </html>
